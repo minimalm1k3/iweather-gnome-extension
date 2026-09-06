@@ -14,6 +14,19 @@ From the project root, run:
 bash scripts/install.sh
 ```
 
+## Install directly from GitHub
+
+On Ubuntu with GNOME Shell installed, run:
+
+```bash
+install_dir="$(mktemp -d)/iweather-gnome-extension" && \
+git clone --depth 1 https://github.com/minimalm1k3/iweather-gnome-extension.git "$install_dir" && \
+bash "$install_dir/scripts/install.sh"
+```
+
+This downloads the current `main` branch, packages the extension, installs it,
+and enables it for the current user.
+
 The extension source lives at the repository root, so the same tree can be
 reviewed and packaged directly by GNOME Extensions.
 
