@@ -21,7 +21,6 @@ gnome-extensions enable "$extension_uuid"
 cat <<'EOF'
 
 Installation complete. On Wayland, log out and back in so GNOME Shell loads
-the new extension code. If the optional system gnome-rounded-blur module is
-installed, iWeather will use its rounded Gaussian effect automatically;
-otherwise the stock GNOME Gaussian blur remains active.
+the new extension code. The extension uses its bundled rounded Gaussian blur
+fallback and does not install native system components.
 EOF
