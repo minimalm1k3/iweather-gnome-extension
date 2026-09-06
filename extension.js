@@ -807,7 +807,7 @@ export default class WeatherRuExtension extends Extension {
         if (!this._indicator) return;
         this._clearMenu();
         const t = this._text();
-        const root = new St.BoxLayout({vertical: true, style_class: 'weather-ru-menu-box', x_expand: true});
+        const root = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-menu-box', x_expand: true});
         // BoxPointer's arrow is transparent, so its rise cannot be relied on
         // as a visible gap. Translating the content keeps the rounded native
         // blur and the content aligned and leaves a deterministic 6 px gap.
@@ -894,7 +894,7 @@ export default class WeatherRuExtension extends Extension {
         const current = new St.BoxLayout({style_class: 'weather-ru-current', x_expand: true, y_align: Clutter.ActorAlign.CENTER});
         const currentLeft = new St.BoxLayout({style_class: 'weather-ru-current-left', y_align: Clutter.ActorAlign.CENTER});
         currentLeft.add_child(this._iconActor(this._current?.weather_code ?? 3, 76, this._current?.is_day !== 0));
-        const currentCopy = new St.BoxLayout({vertical: true, style_class: 'weather-ru-current-copy', y_align: Clutter.ActorAlign.CENTER});
+        const currentCopy = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-current-copy', y_align: Clutter.ActorAlign.CENTER});
         currentCopy.add_child(this._label(
             this._tempText(this._current?.temperature_2m, false),
             'weather-ru-current-temp',
@@ -913,7 +913,7 @@ export default class WeatherRuExtension extends Extension {
         currentLeft.add_child(currentCopy);
         current.add_child(currentLeft);
         current.add_child(new St.Bin({style_class: 'weather-ru-current-divider'}));
-        const currentRange = new St.BoxLayout({vertical: true, style_class: 'weather-ru-current-range', y_align: Clutter.ActorAlign.CENTER});
+        const currentRange = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-current-range', y_align: Clutter.ActorAlign.CENTER});
         currentRange.translation_y = 22;
         [[t.max, this._daily[0]?.high], [t.min, this._daily[0]?.low]].forEach(([label, value]) => {
             const compactLabel = label.replace(/:+$/u, '');
@@ -959,18 +959,18 @@ export default class WeatherRuExtension extends Extension {
     }
 
     _walletSection(t) {
-        const section = new St.BoxLayout({vertical: true, style_class: 'weather-ru-wallet-section'});
+        const section = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-wallet-section'});
         section.add_child(this._label(t.walletTitle, 'weather-ru-wallet-title'));
         const hint = this._label(t.walletHint, 'weather-ru-wallet-hint');
         hint.clutter_text.line_wrap = true;
         hint.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         section.add_child(hint);
 
-        const list = new St.BoxLayout({vertical: true, style_class: 'weather-ru-wallet-list'});
+        const list = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-wallet-list'});
         for (const option of WALLET_OPTIONS) {
             const expanded = this._expandedWalletOptions.has(option.id);
             const item = new St.BoxLayout({
-                vertical: true,
+                orientation: Clutter.Orientation.VERTICAL,
                 style_class: `weather-ru-wallet-item ${expanded ? 'expanded' : ''}`.trim(),
             });
             const row = new St.BoxLayout({style_class: 'weather-ru-wallet-row', x_expand: true});
@@ -1055,7 +1055,7 @@ export default class WeatherRuExtension extends Extension {
     }
 
     _hourlySection(t) {
-        const box = new St.BoxLayout({vertical: true, style_class: 'weather-ru-hourly-section'});
+        const box = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-hourly-section'});
         box.add_child(this._label(t.hourly, 'weather-ru-section-title'));
         if (this._hourly.length === 0) {
             box.add_child(this._label(this._loading ? t.loading : t.unavailable, 'weather-ru-empty', {x_align: Clutter.ActorAlign.CENTER, x_expand: true}));
@@ -1086,7 +1086,7 @@ export default class WeatherRuExtension extends Extension {
         viewport.set_position(16, 0);
         this._hourly.forEach((hour, index) => {
             const col = new St.BoxLayout({
-                vertical: true,
+                orientation: Clutter.Orientation.VERTICAL,
                 clip_to_allocation: false,
                 style_class: `weather-ru-hour${index === 0 ? ' selected' : ''}`,
             });
@@ -1138,16 +1138,16 @@ export default class WeatherRuExtension extends Extension {
     }
 
     _dailySection(t) {
-        const box = new St.BoxLayout({vertical: true, style_class: 'weather-ru-daily-section'});
+        const box = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-daily-section'});
         box.add_child(this._label(t.daily, 'weather-ru-section-title'));
         if (this._daily.length === 0) {
             box.add_child(this._label(this._loading ? t.loading : t.unavailable, 'weather-ru-empty', {x_align: Clutter.ActorAlign.CENTER, x_expand: true}));
             return box;
         }
-        const rows = new St.BoxLayout({vertical: true, style_class: 'weather-ru-daily'}); const lows = this._daily.map((d) => d.low); const highs = this._daily.map((d) => d.high); const min = Math.min(...lows); const max = Math.max(...highs); const spread = max - min || 1;
+        const rows = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-daily'}); const lows = this._daily.map((d) => d.low); const highs = this._daily.map((d) => d.high); const min = Math.min(...lows); const max = Math.max(...highs); const spread = max - min || 1;
         this._daily.forEach((day, index) => {
             const row = new St.BoxLayout({style_class: `weather-ru-day-row ${index === 0 ? 'today' : 'separated'}`, x_expand: true, y_align: Clutter.ActorAlign.CENTER});
-            const dayCopy = new St.BoxLayout({vertical: true, style_class: 'weather-ru-day-copy', y_align: Clutter.ActorAlign.CENTER});
+            const dayCopy = new St.BoxLayout({orientation: Clutter.Orientation.VERTICAL, style_class: 'weather-ru-day-copy', y_align: Clutter.ActorAlign.CENTER});
             dayCopy.add_child(this._label(this._dayLabel(day.time, index), 'weather-ru-day-label'));
             dayCopy.add_child(this._label(this._formatDate(day.time), 'weather-ru-day-date'));
             row.add_child(dayCopy);

@@ -4,6 +4,8 @@ GNOME Shell weather extension with hourly and 10-day forecasts, optional
 location detection, a wallet section, Weather Icons artwork, and Gaussian
 background blur powered by GNOME Shell.
 
+The release metadata targets GNOME Shell 45, 46, 47, 48, 49, and 50.
+
 ## Install locally
 
 From the project root, run:

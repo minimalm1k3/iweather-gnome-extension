@@ -83,6 +83,16 @@ function supportsProperty(effectType, propertyName) {
     }
 }
 
+function blurRadiusProperty(effectType) {
+    if (supportsProperty(effectType, 'radius'))
+        return 'radius';
+    // GNOME Shell 45 exposed this property as sigma. GNOME Shell 46 renamed
+    // it to radius, so keep the fallback compatible with both APIs.
+    if (supportsProperty(effectType, 'sigma'))
+        return 'sigma';
+    return null;
+}
+
 export async function loadOptionalBlurModule() {
     try {
         const module = await import('gi://Blur?version=1.0');
@@ -102,6 +112,7 @@ export class WeatherGaussianBackdrop {
         this._backgroundClone = null;
         this._windowClone = null;
         this._effect = null;
+        this._effectRadiusProperty = null;
         this._maskEffect = null;
         this._signalIds = [];
         this._usesDynamicBlur = false;
@@ -110,6 +121,7 @@ export class WeatherGaussianBackdrop {
         this._brightness = 1;
         this._repaintLaterId = 0;
         this._unredirectDisabled = false;
+        this._pendingShow = false;
         this._destroyed = false;
     }
 
@@ -133,12 +145,16 @@ export class WeatherGaussianBackdrop {
         try {
             if (isUsableBlurApi(this._blurApi) &&
                 supportsProperty(this._blurApi.BlurEffect, 'corner-radius')) {
-                this._effect = new this._blurApi.BlurEffect({
+                this._effectRadiusProperty = blurRadiusProperty(this._blurApi.BlurEffect);
+                if (!this._effectRadiusProperty)
+                    throw new Error('Rounded blur radius property is unavailable');
+                const effectProperties = {
                     mode: this._blurApi.BlurMode.BACKGROUND,
                     brightness: 1,
-                    radius: 0,
                     corner_radius: 0,
-                });
+                };
+                effectProperties[this._effectRadiusProperty] = 0;
+                this._effect = new this._blurApi.BlurEffect(effectProperties);
                 this._usesDynamicBlur = true;
                 this._blurSurface.add_effect(this._effect);
             } else {
@@ -157,11 +173,15 @@ export class WeatherGaussianBackdrop {
                     });
                     this._blurSurface.add_child(this._windowClone);
                 }
-                this._effect = new Shell.BlurEffect({
+                this._effectRadiusProperty = blurRadiusProperty(Shell.BlurEffect);
+                if (!this._effectRadiusProperty)
+                    throw new Error('Shell blur radius property is unavailable');
+                const effectProperties = {
                     mode: Shell.BlurMode.ACTOR,
                     brightness: 1,
-                    radius: 0,
-                });
+                };
+                effectProperties[this._effectRadiusProperty] = 0;
+                this._effect = new Shell.BlurEffect(effectProperties);
                 this._blurSurface.add_effect(this._effect);
 
                 const shaderSource = await this._loadShaderSource();
@@ -177,6 +197,7 @@ export class WeatherGaussianBackdrop {
             this._backgroundClone = null;
             this._windowClone = null;
             this._effect = null;
+            this._effectRadiusProperty = null;
             this._maskEffect = null;
             this._themeContext = null;
             this._usesDynamicBlur = false;
@@ -201,6 +222,10 @@ export class WeatherGaussianBackdrop {
             if (actor)
                 this._signalIds.push([actor, actor.connect(signal, () => this._syncGeometry())]);
         }
+        this._signalIds.push([
+            this._blurSurface,
+            this._blurSurface.connect('notify::allocation', () => this._syncGeometry()),
+        ]);
 
         this._placeBelowTarget();
         this._syncGeometry();
@@ -264,7 +289,22 @@ export class WeatherGaussianBackdrop {
             );
         }
         this._placeBelowTarget();
+        this._showIfAllocated();
         this.queueRepaint();
+    }
+
+    _showIfAllocated() {
+        if (!this._pendingShow || this._destroyed || !this._blurSurface)
+            return;
+        const allocation = this._blurSurface.get_allocation_box?.();
+        const allocated = allocation
+            ? allocation.x2 > allocation.x1 && allocation.y2 > allocation.y1
+            : this._blurSurface.width > 0 && this._blurSurface.height > 0;
+        if (!allocated)
+            return;
+        this._pendingShow = false;
+        this._disableUnredirect();
+        this._blurSurface.show();
     }
 
     get_effect() {
@@ -307,7 +347,11 @@ export class WeatherGaussianBackdrop {
         if (!this._effect)
             return;
         const scaleFactor = Math.max(1, this._themeContext?.scale_factor ?? 1);
-        this._effect.radius = this._unscaledRadius * scaleFactor;
+        const blurRadius = this._unscaledRadius * scaleFactor;
+        if (this._effectRadiusProperty === 'sigma')
+            this._effect.sigma = blurRadius / 2;
+        else
+            this._effect.radius = blurRadius;
         this._effect.brightness = this._brightness;
         this._maskEffect?.setRadius(SURFACE_CORNER_RADIUS, scaleFactor);
         this.queueRepaint();
@@ -341,12 +385,13 @@ export class WeatherGaussianBackdrop {
     show() {
         if (this._destroyed || !this._blurSurface)
             return;
+        this._pendingShow = true;
         this._syncGeometry();
-        this._disableUnredirect();
-        this._blurSurface.show();
+        this._showIfAllocated();
     }
 
     hide() {
+        this._pendingShow = false;
         this._blurSurface?.hide();
         this._restoreUnredirect();
     }
@@ -381,6 +426,7 @@ export class WeatherGaussianBackdrop {
         if (this._repaintLaterId)
             GLib.Source.remove(this._repaintLaterId);
         this._repaintLaterId = 0;
+        this._pendingShow = false;
         this._blurSurface?.destroy();
         this._blurSurface = null;
         this._backgroundClone = null;
@@ -389,6 +435,7 @@ export class WeatherGaussianBackdrop {
         this._themeContext?.disconnectObject(this);
         this._themeContext = null;
         this._effect = null;
+        this._effectRadiusProperty = null;
         this._maskEffect = null;
         this._blurApi = null;
         this._surface = null;
