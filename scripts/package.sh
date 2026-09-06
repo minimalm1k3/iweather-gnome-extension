@@ -2,8 +2,7 @@
 set -euo pipefail
 
 project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-extension_source="$project_root/iweather@local"
-output="${1:-$project_root/outputs/iweather@local.shell-extension.zip}"
+output="${1:-$project_root/build/iweather@local.shell-extension.zip}"
 if [[ "$output" != /* ]]; then
     output="$(pwd)/$output"
 fi
@@ -14,7 +13,18 @@ cleanup() {
 }
 trap cleanup EXIT
 
-cp -a "$extension_source/." "$staging_dir/"
+for source_path in \
+    extension.js \
+    metadata.json \
+    prefs.js \
+    stylesheet.css \
+    weather-gaussian-blur.js \
+    weather-icons.js \
+    weather-rounded-mask.glsl \
+    assets \
+    schemas; do
+    cp -a "$project_root/$source_path" "$staging_dir/"
+done
 cp "$project_root/LICENSE" "$staging_dir/LICENSE"
 cp "$project_root/ASSET-LICENSES.md" "$staging_dir/ASSET-LICENSES.md"
 glib-compile-schemas --strict --dry-run "$staging_dir/schemas"

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-extension_zip="$project_root/outputs/iweather@local.shell-extension.zip"
+extension_zip="$project_root/build/iweather@local.shell-extension.zip"
 packager="$project_root/scripts/package.sh"
 extension_uuid="iweather@local"
 
