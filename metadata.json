@@ -2,7 +2,7 @@
   "name": "iWeather",
   "description": "Weather widget for GNOME Shell with hourly and 10-day forecasts, Weather Icons artwork, a thank-you wallet, and an interface in 18 languages. Forecasts and geocoding are fetched from Open-Meteo; automatic city detection uses ipinfo.io. The wallet address is copied to the clipboard only after an explicit user click.",
   "uuid": "iweather@local",
-  "version": 43,
+  "version": 45,
   "shell-version": ["45", "46", "47", "48", "49", "50"],
   "url": "https://github.com/minimalm1k3/iweather-gnome-extension",
   "settings-schema": "org.gnome.shell.extensions.weather-ru"

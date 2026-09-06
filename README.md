@@ -33,9 +33,9 @@ reviewed and packaged directly by GNOME Extensions.
 The installable archive contains only GJS, CSS, XML schemas, and artwork. It
 does not contain native libraries or typelibs and requires no system
 dependencies beyond GNOME Shell. The self-contained fallback clones the Shell
-wallpaper and window layers, applies the stock Gaussian blur in actor mode, and
-masks the result with a bundled GLSL rounded rectangle. It therefore keeps live
-blur and rounded corners on a clean installation.
+wallpaper and window layers into a stage-level popup backdrop, applies the stock
+Gaussian actor blur, and masks the result with a bundled GLSL rounded rectangle.
+It therefore keeps live blur and rounded corners on a clean installation.
 
 Run `bash scripts/package.sh` to create a fresh archive at
 `build/iweather@local.shell-extension.zip` without changing the system. The

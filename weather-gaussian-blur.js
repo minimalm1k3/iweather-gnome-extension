@@ -21,6 +21,13 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const SURFACE_CORNER_RADIUS = 22;
 
+function shaderFloat(value) {
+    const shaderValue = new GObject.Value();
+    shaderValue.init(GObject.TYPE_FLOAT);
+    shaderValue.set_float(value);
+    return shaderValue;
+}
+
 const RoundedMaskEffect = GObject.registerClass({
     GTypeName: 'IWeatherRoundedMaskEffect',
 }, class RoundedMaskEffect extends Clutter.ShaderEffect {
@@ -29,6 +36,8 @@ const RoundedMaskEffect = GObject.registerClass({
         this._actorSizeSignalId = 0;
         this._radius = SURFACE_CORNER_RADIUS;
         this._scaleFactor = 1;
+        this._uniforms = new Map();
+        this._uniformsDirty = false;
         this.set_shader_source(shaderSource);
     }
 
@@ -45,9 +54,19 @@ const RoundedMaskEffect = GObject.registerClass({
         const width = Math.max(1, actor.width);
         const height = Math.max(1, actor.height);
         const radius = Math.min(this._radius * this._scaleFactor, width / 2, height / 2);
-        this.set_uniform_value('width', parseFloat(width - 1e-6));
-        this.set_uniform_value('height', parseFloat(height - 1e-6));
-        this.set_uniform_value('radius', parseFloat(radius - 1e-6));
+        this._uniforms.set('width', width - 1e-6);
+        this._uniforms.set('height', height - 1e-6);
+        this._uniforms.set('radius', radius - 1e-6);
+        this._uniformsDirty = true;
+        this.queue_repaint();
+    }
+
+    _uploadUniforms() {
+        if (!this._uniformsDirty || !this.get_actor())
+            return;
+        for (const [name, value] of this._uniforms)
+            this.set_uniform_value(name, shaderFloat(value));
+        this._uniformsDirty = false;
     }
 
     vfunc_set_actor(actor) {
@@ -61,6 +80,11 @@ const RoundedMaskEffect = GObject.registerClass({
                 'notify::size', () => this._updateUniforms());
             this._updateUniforms();
         }
+    }
+
+    vfunc_paint_target(paintNode, paintContext) {
+        this._uploadUniforms();
+        super.vfunc_paint_target(paintNode, paintContext);
     }
 });
 
@@ -109,6 +133,7 @@ export class WeatherGaussianBackdrop {
         this._surface = surface;
         this._blurApi = blurApi;
         this._blurSurface = null;
+        this._blurActor = null;
         this._backgroundClone = null;
         this._windowClone = null;
         this._effect = null;
@@ -161,18 +186,6 @@ export class WeatherGaussianBackdrop {
                 const backgroundGroup = Main.layoutManager?._backgroundGroup;
                 if (!backgroundGroup)
                     throw new Error('Shell background group is unavailable');
-                this._backgroundClone = new Clutter.Clone({
-                    source: backgroundGroup,
-                    reactive: false,
-                });
-                this._blurSurface.add_child(this._backgroundClone);
-                if (global.window_group) {
-                    this._windowClone = new Clutter.Clone({
-                        source: global.window_group,
-                        reactive: false,
-                    });
-                    this._blurSurface.add_child(this._windowClone);
-                }
                 this._effectRadiusProperty = blurRadiusProperty(Shell.BlurEffect);
                 if (!this._effectRadiusProperty)
                     throw new Error('Shell blur radius property is unavailable');
@@ -182,11 +195,33 @@ export class WeatherGaussianBackdrop {
                 };
                 effectProperties[this._effectRadiusProperty] = 0;
                 this._effect = new Shell.BlurEffect(effectProperties);
-                this._blurSurface.add_effect(this._effect);
 
                 const shaderSource = await this._loadShaderSource();
                 if (this._destroyed)
                     return false;
+                // Render clones into a child, blur that actor, then mask the
+                // completed child texture on its parent. Shell's BACKGROUND
+                // mode cannot be masked from JavaScript because it samples
+                // the parent's offscreen framebuffer instead of the stage.
+                this._blurActor = new St.Widget({
+                    name: 'weather-ru-gaussian-blur-content',
+                    reactive: false,
+                    clip_to_allocation: true,
+                });
+                this._backgroundClone = new Clutter.Clone({
+                    source: backgroundGroup,
+                    reactive: false,
+                });
+                this._blurActor.add_child(this._backgroundClone);
+                if (global.window_group) {
+                    this._windowClone = new Clutter.Clone({
+                        source: global.window_group,
+                        reactive: false,
+                    });
+                    this._blurActor.add_child(this._windowClone);
+                }
+                this._blurActor.add_effect(this._effect);
+                this._blurSurface.add_child(this._blurActor);
                 this._maskEffect = new RoundedMaskEffect(shaderSource);
                 this._blurSurface.add_effect(this._maskEffect);
             }
@@ -194,6 +229,7 @@ export class WeatherGaussianBackdrop {
             logError(error, 'iWeather blur effect is unavailable');
             this._blurSurface.destroy();
             this._blurSurface = null;
+            this._blurActor = null;
             this._backgroundClone = null;
             this._windowClone = null;
             this._effect = null;
@@ -274,6 +310,8 @@ export class WeatherGaussianBackdrop {
 
         this._blurSurface.set_position(x, y);
         this._blurSurface.set_size(width, height);
+        this._blurActor?.set_position(0, 0);
+        this._blurActor?.set_size(width, height);
         this._blurSurface.opacity = this._target?.opacity ?? 255;
         const baseWidth = Math.max(1, this._surface.width);
         if (this._usesDynamicBlur)
@@ -296,11 +334,13 @@ export class WeatherGaussianBackdrop {
     _showIfAllocated() {
         if (!this._pendingShow || this._destroyed || !this._blurSurface)
             return;
-        const allocation = this._blurSurface.get_allocation_box?.();
-        const allocated = allocation
-            ? allocation.x2 > allocation.x1 && allocation.y2 > allocation.y1
-            : this._blurSurface.width > 0 && this._blurSurface.height > 0;
-        if (!allocated)
+        // Clutter.ActorBox no longer exposes x1/x2 as JavaScript fields on
+        // GNOME 50. Testing those fields kept this actor permanently hidden
+        // even though set_size() had already assigned valid dimensions.
+        const width = this._blurSurface.width;
+        const height = this._blurSurface.height;
+        if (!Number.isFinite(width) || !Number.isFinite(height) ||
+            width <= 0 || height <= 0)
             return;
         this._pendingShow = false;
         this._disableUnredirect();
@@ -363,6 +403,7 @@ export class WeatherGaussianBackdrop {
 
         this._effect.queue_repaint();
         this._maskEffect?.queue_repaint();
+        this._blurActor?.queue_redraw();
         this._blurSurface.queue_redraw();
         if (this._repaintLaterId)
             return;
@@ -376,6 +417,7 @@ export class WeatherGaussianBackdrop {
             if (!this._destroyed && this._effect && this._blurSurface) {
                 this._effect.queue_repaint();
                 this._maskEffect?.queue_repaint();
+                this._blurActor?.queue_redraw();
                 this._blurSurface.queue_redraw();
             }
             return GLib.SOURCE_REMOVE;
@@ -429,6 +471,7 @@ export class WeatherGaussianBackdrop {
         this._pendingShow = false;
         this._blurSurface?.destroy();
         this._blurSurface = null;
+        this._blurActor = null;
         this._backgroundClone = null;
         this._windowClone = null;
         this._restoreUnredirect();
