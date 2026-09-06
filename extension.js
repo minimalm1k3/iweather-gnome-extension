@@ -402,6 +402,24 @@ export default class WeatherRuExtension extends Extension {
         }
     }
 
+    _copyAddressToClipboard(address) {
+        if (typeof address !== 'string' || address.length === 0)
+            return false;
+
+        try {
+            // This is deliberately called only from the user-activated copy
+            // button. The extension never reads or monitors clipboard content.
+            St.Clipboard.get_default().set_text(
+                St.ClipboardType.CLIPBOARD,
+                address,
+            );
+            return true;
+        } catch (error) {
+            console.warn(`iWeather clipboard: ${error}`);
+            return false;
+        }
+    }
+
     _hourMaxScroll() {
         if (!this._hourStrip || !this._hourViewport)
             return 0;
@@ -1027,17 +1045,23 @@ export default class WeatherRuExtension extends Extension {
                     accessible_name: `${t.copyAddress}: ${option.label}`,
                 });
                 copy.connect('clicked', () => {
-                    St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, option.address);
-                    feedback.text = t.copied;
-                    copy.add_style_pseudo_class('checked');
+                    const copied = this._copyAddressToClipboard(option.address);
+                    feedback.text = copied ? t.copied : t.copyAddress;
+                    if (copied)
+                        copy.add_style_pseudo_class('checked');
                     if (this._walletFeedbackSource)
                         GLib.Source.remove(this._walletFeedbackSource);
-                    this._walletFeedbackSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1600, () => {
-                        feedback.text = t.copyAddress;
+                    if (copied) {
+                        this._walletFeedbackSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1600, () => {
+                            feedback.text = t.copyAddress;
+                            copy.remove_style_pseudo_class('checked');
+                            this._walletFeedbackSource = 0;
+                            return GLib.SOURCE_REMOVE;
+                        });
+                    } else {
                         copy.remove_style_pseudo_class('checked');
                         this._walletFeedbackSource = 0;
-                        return GLib.SOURCE_REMOVE;
-                    });
+                    }
                 });
                 item.add_child(copy);
             }
