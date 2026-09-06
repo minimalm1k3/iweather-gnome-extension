@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.weather-ru" path="/org/gnome/shell/extensions/weather-ru/">
+    <key name="language" type="s"><choices><choice value="ru"/><choice value="en"/><choice value="de"/><choice value="fr"/><choice value="es"/><choice value="it"/><choice value="pt"/><choice value="pl"/><choice value="uk"/><choice value="tr"/><choice value="ar"/><choice value="hi"/><choice value="zh"/><choice value="ja"/><choice value="ko"/><choice value="vi"/><choice value="id"/><choice value="th"/></choices><default>"en"</default><summary>Interface language</summary><description>Supported interface locale code</description></key>
+    <key name="temperature-unit" type="s"><choices><choice value="celsius"/><choice value="fahrenheit"/></choices><default>"celsius"</default><summary>Temperature unit</summary><description>celsius or fahrenheit</description></key>
+    <key name="background-opacity" type="i"><range min="0" max="100"/><default>60</default><summary>Widget background opacity</summary><description>0 = fully transparent, 100 = fully opaque</description></key>
+    <key name="background-color" type="s"><default>"#1f2640"</default><summary>Widget background color</summary><description>Hex color used for the widget background</description></key>
+    <key name="background-blur" type="i"><range min="0" max="100"/><default>90</default><summary>Gaussian blur</summary><description>Gaussian background blur level from 0 to 100 percent</description></key>
+    <key name="hardware-acceleration" type="b"><default>true</default><summary>Hardware accelerated rendering</summary><description>Use GPU-friendly icon rendering in the widget</description></key>
+    <key name="location-mode" type="s"><choices><choice value="auto"/><choice value="manual"/></choices><default>"auto"</default><summary>Location source</summary><description>auto or manual</description></key>
+    <key name="manual-latitude" type="d"><range min="-90" max="90"/><default>56.35</default><summary>Manual latitude</summary><description>Latitude for manual location</description></key>
+    <key name="manual-longitude" type="d"><range min="-180" max="180"/><default>43.87</default><summary>Manual longitude</summary><description>Longitude for manual location</description></key>
+    <key name="manual-location-name" type="s"><default>"Sormovsky District, Volga Federal District"</default><summary>Manual location name</summary><description>Text shown in the widget</description></key>
+    <key name="location-cache" type="s"><default>""</default><summary>Cached location</summary><description>latitude,longitude|name</description></key>
+  </schema>
+</schemalist>

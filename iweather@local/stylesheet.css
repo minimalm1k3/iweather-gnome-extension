@@ -1,0 +1,477 @@
+.weather-ru-popup {
+    -arrow-background-color: transparent;
+    -arrow-border-color: transparent;
+    -arrow-border-width: 0px;
+    -arrow-base: 0px;
+    -arrow-rise: 0px;
+    -boxpointer-gap: 0px;
+    -arrow-border-radius: 0px;
+    background-color: transparent;
+    border: 0 solid transparent;
+    box-shadow: none;
+}
+
+.weather-ru-popup.popup-menu,
+.weather-ru-popup.popup-menu.panel-menu,
+.weather-ru-popup .popup-menu,
+.weather-ru-popup .popup-menu-content {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #f5f8ff;
+    border: 0 solid transparent !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    box-shadow: none !important;
+}
+
+/* The popup shell is only a transparent host; the root surface below owns
+ * the single visible frame, color and blur. Keep every state transparent,
+ * including the panel-menu margin that Yaru adds to status-area menus. */
+.weather-ru-popup,
+.weather-ru-popup:hover,
+.weather-ru-popup:active,
+.weather-ru-popup:focus,
+.weather-ru-popup.popup-menu.panel-menu,
+.weather-ru-popup .popup-menu,
+.weather-ru-popup .popup-menu:hover,
+.weather-ru-popup .popup-menu:active,
+.weather-ru-popup .popup-menu:focus,
+.weather-ru-popup .popup-menu-content,
+.weather-ru-popup .popup-menu-content:hover,
+.weather-ru-popup .popup-menu-content:active,
+.weather-ru-popup .popup-menu-content:focus {
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border: 0 solid transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.weather-ru-popup .popup-menu-item,
+.weather-ru-popup .popup-menu-item:insensitive {
+    padding: 0;
+    color: #f5f8ff;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+/*
+ * PopupBaseMenuItem receives the Shell theme's hover/pressed backdrop even
+ * when the actual controls are nested inside it. Keep that implementation
+ * wrapper transparent so pressing the hourly viewport or scrolling the daily
+ * forecast cannot tint the whole weather surface. Component-level button and
+ * selected-hour states are scoped to their own actors below and are unaffected.
+ */
+.weather-ru-popup .popup-menu-item:hover,
+.weather-ru-popup .popup-menu-item:active,
+.weather-ru-popup .popup-menu-item:focus,
+.weather-ru-popup .popup-menu-item:active:hover,
+.weather-ru-popup .popup-menu-item:active:focus,
+.weather-ru-popup .popup-menu-item:selected,
+.weather-ru-popup .popup-menu-item:checked {
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.weather-ru-popup .weather-ru-root-item,
+.weather-ru-popup .weather-ru-root-item:hover,
+.weather-ru-popup .weather-ru-root-item:active,
+.weather-ru-popup .weather-ru-root-item:focus,
+.weather-ru-popup .weather-ru-root-item:selected,
+.weather-ru-popup .weather-ru-root-item:checked {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border: 0 solid transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+/* Frame 1 typography: Geist for the hero copy, Inter for UI/data labels. */
+.weather-ru-menu-box {
+    width: 443px;
+    min-width: 443px;
+    max-width: 443px;
+    min-height: 0;
+    padding: 0 0 16px;
+    font-family: Inter;
+    color: #f6f7fc;
+    border: 1px solid rgba(224, 234, 255, 0.15);
+    border-radius: 22px;
+    /* The runtime backdrop keeps the selected color below the blur. */
+    background-color: rgba(31, 38, 64, 0.48);
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(152, 177, 223, 0.46);
+    background-gradient-end: rgba(13, 20, 43, 0.64);
+    box-shadow: none;
+}
+.weather-ru-gaussian-blur-surface {
+    border-radius: 22px;
+    background-color: transparent;
+    border: 0 solid transparent;
+    box-shadow: none;
+}
+
+.weather-ru-header {
+    min-height: 35px;
+    padding: 0 18px;
+    border: 0 solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+    background-gradient-start: transparent;
+    background-gradient-end: transparent;
+    box-shadow: none;
+}
+.weather-ru-separator {
+    min-height: 1px;
+    max-height: 1px;
+    height: 1px;
+    margin: 0;
+    background-color: rgba(222, 232, 252, 0.14);
+}
+.weather-ru-location-bar { spacing: 10px; min-height: 35px; }
+.weather-ru-header-icon { icon-size: 14px; }
+.weather-ru-location-icon { color: #aeb5cb; }
+.weather-ru-location { font-family: Inter; font-size: 14px; font-weight: 400; color: #aeb5cb; }
+
+.weather-ru-control-button,
+.weather-ru-nav-button {
+    padding: 0;
+    color: #b9cff1;
+    border: 0 solid transparent;
+    border-radius: 999px;
+    background-color: transparent;
+    box-shadow: none;
+}
+.weather-ru-control-button { min-width: 26px; min-height: 26px; }
+.weather-ru-control-button:hover,
+.weather-ru-nav-button:hover { color: #ffffff; background-color: rgba(161, 192, 236, 0.15); }
+.weather-ru-control-button:active,
+.weather-ru-nav-button:active { background-color: rgba(161, 192, 236, 0.24); }
+.weather-ru-control-button.active { color: #ffffff; background-color: rgba(117, 191, 255, 0.22); }
+
+.weather-ru-wallet-section {
+    min-height: 0;
+    padding: 10px 18px 18px;
+}
+.weather-ru-wallet-title {
+    font-family: Geist;
+    font-size: 21px;
+    font-weight: 600;
+    color: #f7f8fc;
+}
+.weather-ru-wallet-hint {
+    max-width: 390px;
+    margin-top: 5px;
+    margin-bottom: 14px;
+    font-family: Inter;
+    font-size: 11px;
+    font-weight: 400;
+    color: #aeb5cb;
+}
+.weather-ru-wallet-scroll {
+    max-height: 510px;
+    min-height: 0;
+}
+.weather-ru-wallet-list { spacing: 7px; padding-right: 1px; }
+.weather-ru-wallet-item {
+    border: 1px solid rgba(222, 232, 252, 0.12);
+    border-radius: 13px;
+    background-color: rgba(99, 121, 168, 0.10);
+}
+.weather-ru-wallet-item.expanded {
+    border-color: rgba(117, 191, 255, 0.28);
+    background-color: rgba(99, 121, 168, 0.16);
+}
+.weather-ru-wallet-toggle {
+    min-height: 44px;
+    padding: 0 12px;
+    color: #f6f7fc;
+    border: 0 solid transparent;
+    border-radius: 12px;
+    background-color: transparent;
+    box-shadow: none;
+}
+.weather-ru-wallet-toggle:hover { background-color: rgba(161, 192, 236, 0.11); }
+.weather-ru-wallet-toggle:active { background-color: rgba(161, 192, 236, 0.18); }
+.weather-ru-wallet-row { min-height: 42px; spacing: 10px; }
+.weather-ru-wallet-coin-icon { min-width: 24px; }
+.weather-ru-wallet-label {
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f4f6fd;
+}
+.weather-ru-wallet-chevron { color: #9ba7be; }
+.weather-ru-wallet-address-button {
+    min-height: 48px;
+    margin: 0 8px 8px;
+    padding: 0 10px;
+    color: #cfd7eb;
+    border: 1px solid rgba(222, 232, 252, 0.10);
+    border-radius: 10px;
+    background-color: rgba(8, 13, 32, 0.30);
+    box-shadow: none;
+}
+.weather-ru-wallet-address-button:hover {
+    color: #ffffff;
+    border-color: rgba(117, 191, 255, 0.30);
+    background-color: rgba(117, 191, 255, 0.10);
+}
+.weather-ru-wallet-address-button:checked {
+    border-color: rgba(115, 224, 154, 0.42);
+    background-color: rgba(115, 224, 154, 0.12);
+}
+.weather-ru-wallet-address-row { spacing: 7px; }
+.weather-ru-wallet-address {
+    max-width: 245px;
+    font-family: monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: #d7deef;
+}
+.weather-ru-wallet-copy-icon { color: #75bfff; }
+.weather-ru-wallet-copy-label {
+    min-width: 77px;
+    font-family: Inter;
+    font-size: 9px;
+    font-weight: 600;
+    color: #75bfff;
+}
+.weather-ru-wallet-address-button:checked .weather-ru-wallet-copy-icon,
+.weather-ru-wallet-address-button:checked .weather-ru-wallet-copy-label { color: #73e09a; }
+
+.weather-ru-current {
+    min-height: 102px;
+    margin-top: 0;
+    padding: 12px 30px;
+    border: 0 solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+}
+.weather-ru-current-left { spacing: 15px; min-width: 300px; max-width: 300px; }
+.weather-ru-current-copy { spacing: 0; }
+.weather-ru-current-temp { font-family: Geist; font-size: 72px; font-weight: 200; color: #f7f8fc; }
+.weather-ru-current-condition { max-width: 195px; font-family: Geist; font-size: 15px; font-weight: 400; color: #c7ccdc; }
+.weather-ru-current-divider {
+    width: 0;
+    min-width: 0;
+    height: 0;
+    margin: 0;
+    background-color: transparent;
+}
+.weather-ru-current-range { spacing: 2px; min-width: 82px; max-width: 82px; }
+.weather-ru-current-range-row { min-width: 82px; max-width: 82px; spacing: 2px; }
+.weather-ru-current-range-label,
+.weather-ru-current-range-temp {
+    font-family: Inter;
+    font-size: 14px;
+    font-weight: 400;
+    color: #aeb5cb;
+}
+.weather-ru-current-range-label { min-width: 45px; max-width: 45px; }
+.weather-ru-current-range-temp { min-width: 35px; max-width: 35px; text-align: right; }
+.weather-ru-color-icon { -st-icon-style: regular; }
+.weather-ru-symbolic-icon { color: #a9d0ff; }
+.weather-ru-hero-icon { color: #ffe34d; }
+
+.weather-ru-hourly-section,
+.weather-ru-hourly-section:hover,
+.weather-ru-hourly-section:active,
+.weather-ru-hourly-section:focus,
+.weather-ru-hourly-section:selected,
+.weather-ru-hourly-section:checked {
+    min-height: 185px;
+    margin-top: 0;
+    padding: 12px 18px 5px;
+    border: 0 solid transparent;
+    border-radius: 0;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    box-shadow: none !important;
+}
+.weather-ru-section-title { font-family: Inter; font-size: 11px; font-weight: 600; letter-spacing: 0.2px; color: #cdd2e1; }
+.weather-ru-hourly,
+.weather-ru-hourly:hover,
+.weather-ru-hourly:active,
+.weather-ru-hourly:focus,
+.weather-ru-hour-viewport,
+.weather-ru-hour-viewport:hover,
+.weather-ru-hour-viewport:active,
+.weather-ru-hour-viewport:focus,
+.weather-ru-hour-viewport:selected,
+.weather-ru-hour-viewport:checked {
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+.weather-ru-hourly { spacing: 3px; min-height: 149px; max-height: 149px; margin-top: 12px; }
+.weather-ru-hour-viewport {
+    width: 375px;
+    min-width: 375px;
+    max-width: 375px;
+    min-height: 149px;
+    max-height: 149px;
+}
+.weather-ru-hour-strip { spacing: 3px; }
+.weather-ru-hour {
+    spacing: 1px;
+    min-width: 72px;
+    max-width: 72px;
+    min-height: 141px;
+    padding: 5px 0 3px;
+    border: 0 solid transparent;
+    border-radius: 15px;
+    background-color: transparent;
+}
+.weather-ru-hour.selected {
+    border: 0 solid transparent;
+    background-color: rgba(135, 143, 169, 0.72);
+    box-shadow: none;
+}
+.weather-ru-hour-time { min-height: 14px; font-family: Inter; font-size: 10px; font-weight: 600; color: #eef0f8; }
+.weather-ru-hour-temp { min-height: 19px; font-family: Geist; font-size: 18px; font-weight: 400; color: #f5f6fb; }
+.weather-ru-hour-condition { min-height: 17px; max-width: 68px; font-family: Geist; font-size: 9px; font-weight: 400; color: #d4d7e4; }
+.weather-ru-metric { width: 72px; min-width: 72px; max-width: 72px; spacing: 2px; min-height: 15px; padding: 0; }
+.weather-ru-metric-icon { icon-size: 12px; min-width: 12px; max-width: 12px; margin-left: 8px; color: #83b9ff; }
+.weather-ru-metric-label-bin { width: 50px; min-width: 50px; max-width: 50px; }
+.weather-ru-metric-label { text-align: right; font-size: 11px; color: #d1d7e6; }
+.weather-ru-metric.uv .weather-ru-metric-icon,
+.weather-ru-metric.uv .weather-ru-metric-label { color: #dfeb72; }
+.weather-ru-metric.rain .weather-ru-metric-icon,
+.weather-ru-metric.rain .weather-ru-metric-label { color: #65baff; font-weight: 650; }
+.weather-ru-nav-button {
+    min-width: 0;
+    max-width: 0;
+    width: 0;
+    min-height: 0;
+    max-height: 0;
+    padding: 0;
+    border: 0 solid transparent;
+    background-color: transparent;
+    opacity: 0;
+}
+.weather-ru-hour-nav-button {
+    min-width: 16px;
+    max-width: 16px;
+    min-height: 28px;
+    max-height: 28px;
+    padding: 0;
+    color: #cdd8ed;
+    border: 0 solid transparent;
+    border-radius: 999px;
+    background-color: transparent;
+}
+.weather-ru-hour-nav-button:hover { color: #ffffff; background-color: rgba(161, 192, 236, 0.18); }
+.weather-ru-hour-nav-button:active { background-color: rgba(161, 192, 236, 0.28); }
+
+.weather-ru-daily-section,
+.weather-ru-daily-section:hover,
+.weather-ru-daily-section:active,
+.weather-ru-daily-section:focus,
+.weather-ru-daily-section:selected,
+.weather-ru-daily-section:checked {
+    min-height: 225px;
+    margin-top: 0;
+    padding: 15px 18px 6px;
+    border: 0 solid transparent;
+    border-radius: 0;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    box-shadow: none !important;
+}
+.weather-ru-daily-scroll,
+.weather-ru-daily-scroll:hover,
+.weather-ru-daily-scroll:active,
+.weather-ru-daily-scroll:focus,
+.weather-ru-daily-scroll:selected,
+.weather-ru-daily-scroll:checked {
+    min-height: 190px;
+    max-height: 190px;
+    margin-top: 10px;
+    padding: 0;
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+.weather-ru-daily-scroll StViewport,
+.weather-ru-daily-scroll StViewport:hover,
+.weather-ru-daily-scroll StViewport:active,
+.weather-ru-daily-scroll StViewport:focus,
+.weather-ru-daily-scroll StViewport:selected,
+.weather-ru-daily-scroll StViewport:checked {
+    background-color: transparent !important;
+    background-gradient-start: transparent !important;
+    background-gradient-end: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+.weather-ru-daily-scroll StScrollBar { min-width: 0; max-width: 0; width: 0; opacity: 0; }
+.weather-ru-daily-scroll StScrollBar > .vhandle { min-width: 0; max-width: 0; width: 0; opacity: 0; }
+.weather-ru-daily { spacing: 4px; padding: 0; }
+.weather-ru-day-row {
+    spacing: 6px;
+    min-height: 34px;
+    padding: 1px 4px;
+    border: 0 solid transparent;
+    border-radius: 0;
+    background-color: transparent;
+}
+.weather-ru-day-row.today {
+    border: 0 solid transparent;
+    background-color: transparent;
+}
+.weather-ru-day-row.separated {
+    border-top: 1px solid rgba(222, 232, 252, 0.12);
+}
+.weather-ru-day-copy { min-width: 78px; }
+.weather-ru-day-label { font-family: Inter; font-size: 14px; font-weight: 600; color: #f1f3f9; }
+.weather-ru-day-date { font-family: Inter; font-size: 9px; color: #aeb5c9; }
+.weather-ru-day-condition { min-width: 76px; max-width: 118px; font-family: Inter; font-size: 12px; color: #c7cbd9; }
+.weather-ru-day-range { spacing: 7px; }
+.weather-ru-low,
+.weather-ru-high { min-width: 31px; font-size: 14px; }
+.weather-ru-low { min-width: 31px; font-size: 14px; color: #d4d7e3; }
+.weather-ru-high { color: #f3f6fb; font-weight: 760; }
+.weather-ru-range-track {
+    min-width: 78px;
+    max-width: 78px;
+    min-height: 10px;
+    max-height: 10px;
+    background-color: transparent;
+}
+.weather-ru-range-line {
+    border-radius: 999px;
+    background-color: rgba(128, 147, 175, 0.36);
+}
+.weather-ru-range-fill {
+    border-radius: 999px;
+    background-color: #79d98e;
+    box-shadow: 0 0 3px 0 rgba(121, 217, 142, 0.25);
+}
+.weather-ru-range-point {
+    border-radius: 999px;
+    background-color: #ffe01c;
+    box-shadow: 0 0 4px 1px rgba(255, 224, 28, 0.45);
+}
+
+.weather-ru-empty { min-height: 48px; padding: 15px 4px; font-size: 8px; color: rgba(220, 230, 244, 0.56); }
