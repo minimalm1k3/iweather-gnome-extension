@@ -191,7 +191,7 @@ export class WeatherGaussianBackdrop {
                 this._blurSurface.add_effect(this._maskEffect);
             }
         } catch (error) {
-            console.warn(`iWeather: blur effect is unavailable (${error})`);
+            logError(error, 'iWeather blur effect is unavailable');
             this._blurSurface.destroy();
             this._blurSurface = null;
             this._backgroundClone = null;

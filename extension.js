@@ -398,7 +398,7 @@ export default class WeatherRuExtension extends Extension {
             this._cancelHourlyDrag();
             this._rebuildMenu();
         } catch (error) {
-            console.error(`iWeather interface: ${error}`);
+            logError(error, 'iWeather interface rebuild failed');
         }
     }
 
@@ -415,7 +415,7 @@ export default class WeatherRuExtension extends Extension {
             );
             return true;
         } catch (error) {
-            console.warn(`iWeather clipboard: ${error}`);
+            logError(error, 'iWeather clipboard copy failed');
             return false;
         }
     }
@@ -468,7 +468,7 @@ export default class WeatherRuExtension extends Extension {
         try {
             this._hourDragGrab = global.stage.grab(actor);
         } catch (error) {
-            console.debug(`iWeather pointer grab: ${error}`);
+            logError(error, 'iWeather pointer grab failed');
         }
         this._blurBackdrop?.queueRepaint();
         return Clutter.EVENT_STOP;
@@ -498,7 +498,7 @@ export default class WeatherRuExtension extends Extension {
         try {
             this._hourDragGrab?.dismiss();
         } catch (error) {
-            console.debug(`iWeather pointer release: ${error}`);
+            logError(error, 'iWeather pointer release failed');
         }
         this._hourDragGrab = null;
         this._hourDragMaxScroll = 0;
@@ -580,7 +580,7 @@ export default class WeatherRuExtension extends Extension {
                         localizedName = await this._localizedLocationName({lat, lon, name: localizedName}, cancellable);
                         this._writeLocationCache(lat, lon, localizedName);
                     } catch (error) {
-                        console.warn(`iWeather localized location: ${error}`);
+                        logError(error, 'iWeather cached location localization failed');
                     }
                 }
                 return {lat, lon, name: localizedName};
@@ -595,12 +595,12 @@ export default class WeatherRuExtension extends Extension {
                 try {
                     name = await this._localizedLocationName({lat, lon, name: detectedName, countryCode: json.country || ''}, cancellable);
                 } catch (error) {
-                    console.warn(`iWeather localized location: ${error}`);
+                    logError(error, 'iWeather detected location localization failed');
                 }
                 this._writeLocationCache(lat, lon, name);
                 return {lat, lon, name};
             }
-        } catch (error) { console.warn(`iWeather location: ${error}`); }
+        } catch (error) { logError(error, 'iWeather location detection failed'); }
         return FALLBACK_LOCATION;
     }
 
@@ -672,7 +672,7 @@ export default class WeatherRuExtension extends Extension {
                 return;
             this._loading = false;
             this._lastError = String(error);
-            console.warn(`iWeather forecast: ${error}`);
+            logError(error, 'iWeather forecast update failed');
             this._safeRebuildMenu();
             this._scheduleRetry();
         } finally {
